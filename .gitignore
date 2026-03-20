@@ -1,3 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.env
+.venv/
+venv/
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Auto-added by LogicPatterns Agent
 # Dependencies
@@ -5,20 +17,13 @@ node_modules/
 .pnp/
 .pnp.js
 # Build outputs
-dist/
-build/
 .next/
 out/
 # Environment
-.env
 .env.local
 .env.*.local
 # Python
-__pycache__/
 *.pyc
-.venv/
-venv/
-*.egg-info/
 # IDE
 .idea/
 .vscode/
@@ -28,5 +33,4 @@ venv/
 .DS_Store
 Thumbs.db
 # Logs
-*.log
 npm-debug.log*
