@@ -3,9 +3,9 @@
   "project": {
     "name": "ui_testing_software",
     "scaffold_type": "backend",
-    "tech_stack": "Python 3.11",
+    "tech_stack": "Stack",
     "capability_name": "ui_testing_software",
-    "platform": "Mobile",
+    "platform": "Web",
     "project_size": "Small"
   },
   "structure": {

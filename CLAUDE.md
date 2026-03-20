@@ -2,7 +2,7 @@
 
 ## Project: ui_testing_software
 
-**Tech Stack:** Python 3.11
+**Tech Stack:** Stack
 **Scaffold Type:** Backend service
 
 ## Scaffold Structure
