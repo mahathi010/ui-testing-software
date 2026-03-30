@@ -2,7 +2,7 @@
 
 ## Project: ui_testing_software
 
-**Tech Stack:** Stack
+**Tech Stack:** FastAPI, SQLAlchemy 2.0 (async), PostgreSQL, Alembic, Redis, Celery, Pydantic v2
 **Scaffold Type:** Backend service
 
 ## Scaffold Structure
@@ -10,7 +10,8 @@
 ```
   backend/
   backend/app/
-  backend/app/core/
+  backend/app/core/           # database.py, deps.py
+  backend/app/login_mgmt/login_flow_backend/credential_validation/
   backend/tests/
   backend/tests/unit/
   backend/migrations/
@@ -24,13 +25,15 @@ Each feature gets its own subdirectory under the capability folder:
 
 | File | Location |
 |------|----------|
-| `models.py` | `backend/app/ui_testing_software/<feature>/` |
-| `schema.py` | `backend/app/ui_testing_software/<feature>/` |
-| `repository.py` | `backend/app/ui_testing_software/<feature>/` |
-| `service.py` | `backend/app/ui_testing_software/<feature>/` |
-| `api.py` | `backend/app/ui_testing_software/<feature>/` |
-| `__init__.py` | `backend/app/ui_testing_software/<feature>/` |
+| `models.py` | `backend/app/<cap>/<capability_group>/<feature>/` |
+| `schema.py` | `backend/app/<cap>/<capability_group>/<feature>/` |
+| `repository.py` | `backend/app/<cap>/<capability_group>/<feature>/` |
+| `service.py` | `backend/app/<cap>/<capability_group>/<feature>/` |
+| `api.py` | `backend/app/<cap>/<capability_group>/<feature>/` |
+| `__init__.py` | `backend/app/<cap>/<capability_group>/<feature>/` |
 | `test_*_service.py` | `backend/tests/unit/` |
+
+**Implemented feature:** `backend/app/login_mgmt/login_flow_backend/credential_validation/`
 
 Each feature folder has short file names (`models.py`, not `feature_models.py`).
 
