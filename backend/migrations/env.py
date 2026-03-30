@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 # Import Base and all models so autogenerate can see them
 from app.core.database import Base
 import app.login_mgmt.login_flow_backend.credential_validation.models  # noqa: F401
+import app.login_mgmt.login_flow_backend.session_access_control.models  # noqa: F401
 
 config = context.config
 
