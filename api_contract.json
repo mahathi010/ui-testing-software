@@ -1,0 +1,396 @@
+{
+  "version": "1.0.0",
+  "base_url": "http://localhost:8000",
+  "routes": [
+    {
+      "id": 1,
+      "method": "GET",
+      "path": "/health",
+      "summary": "Health check",
+      "tags": ["health"],
+      "responses": {
+        "200": {
+          "description": "Service is healthy",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "status": { "type": "string", "example": "healthy" },
+              "service": { "type": "string", "example": "ui_testing_software" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "method": "GET",
+      "path": "/v1/credential-validations/",
+      "summary": "List scenarios",
+      "tags": ["credential-validations"],
+      "query_params": [
+        { "name": "coverage_area", "type": "string", "enum": ["RENDERING","CONTENT_INTERACTIONS","NAVIGATION","CREDENTIAL_SUBMISSION","ERROR_RECOVERY"], "required": false },
+        { "name": "is_active", "type": "boolean", "required": false },
+        { "name": "requirement_ref", "type": "string", "required": false },
+        { "name": "page", "type": "integer", "default": 1, "required": false },
+        { "name": "page_size", "type": "integer", "default": 20, "required": false },
+        { "name": "sort_by", "type": "string", "default": "created_at", "required": false },
+        { "name": "sort_order", "type": "string", "enum": ["asc","desc"], "default": "desc", "required": false }
+      ],
+      "responses": {
+        "200": {
+          "description": "Paginated list of scenarios",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "items": { "type": "array", "items": { "$ref": "#/schemas/ScenarioResponse" } },
+              "total": { "type": "integer" },
+              "page": { "type": "integer" },
+              "page_size": { "type": "integer" },
+              "pages": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "method": "POST",
+      "path": "/v1/credential-validations/",
+      "summary": "Create scenario",
+      "tags": ["credential-validations"],
+      "request_body": { "$ref": "#/schemas/ScenarioCreate" },
+      "responses": {
+        "201": { "description": "Scenario created", "schema": { "$ref": "#/schemas/ScenarioResponse" } },
+        "422": { "description": "Validation error" }
+      }
+    },
+    {
+      "id": 4,
+      "method": "GET",
+      "path": "/v1/credential-validations/{scenario_id}",
+      "summary": "Get scenario",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }],
+      "responses": {
+        "200": { "description": "Scenario", "schema": { "$ref": "#/schemas/ScenarioResponse" } },
+        "404": { "description": "Scenario not found" }
+      }
+    },
+    {
+      "id": 5,
+      "method": "PUT",
+      "path": "/v1/credential-validations/{scenario_id}",
+      "summary": "Update scenario",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }],
+      "request_body": { "$ref": "#/schemas/ScenarioUpdate" },
+      "responses": {
+        "200": { "description": "Updated scenario", "schema": { "$ref": "#/schemas/ScenarioResponse" } },
+        "404": { "description": "Scenario not found" },
+        "422": { "description": "Validation error" }
+      }
+    },
+    {
+      "id": 6,
+      "method": "DELETE",
+      "path": "/v1/credential-validations/{scenario_id}",
+      "summary": "Delete scenario",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }],
+      "responses": {
+        "204": { "description": "Scenario deleted" },
+        "404": { "description": "Scenario not found" }
+      }
+    },
+    {
+      "id": 7,
+      "method": "GET",
+      "path": "/v1/credential-validations/{scenario_id}/rules",
+      "summary": "List rules",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }],
+      "responses": {
+        "200": { "description": "List of rules", "schema": { "type": "array", "items": { "$ref": "#/schemas/RuleResponse" } } },
+        "404": { "description": "Scenario not found" }
+      }
+    },
+    {
+      "id": 8,
+      "method": "POST",
+      "path": "/v1/credential-validations/{scenario_id}/rules",
+      "summary": "Create rule",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }],
+      "request_body": { "$ref": "#/schemas/RuleCreate" },
+      "responses": {
+        "201": { "description": "Rule created", "schema": { "$ref": "#/schemas/RuleResponse" } },
+        "404": { "description": "Scenario not found" },
+        "422": { "description": "Validation error" }
+      }
+    },
+    {
+      "id": 9,
+      "method": "GET",
+      "path": "/v1/credential-validations/{scenario_id}/rules/{rule_id}",
+      "summary": "Get rule",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }, { "name": "rule_id", "type": "uuid" }],
+      "responses": {
+        "200": { "description": "Rule", "schema": { "$ref": "#/schemas/RuleResponse" } },
+        "404": { "description": "Rule or scenario not found" }
+      }
+    },
+    {
+      "id": 10,
+      "method": "PUT",
+      "path": "/v1/credential-validations/{scenario_id}/rules/{rule_id}",
+      "summary": "Update rule",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }, { "name": "rule_id", "type": "uuid" }],
+      "request_body": { "$ref": "#/schemas/RuleUpdate" },
+      "responses": {
+        "200": { "description": "Updated rule", "schema": { "$ref": "#/schemas/RuleResponse" } },
+        "404": { "description": "Rule or scenario not found" },
+        "422": { "description": "Validation error" }
+      }
+    },
+    {
+      "id": 11,
+      "method": "DELETE",
+      "path": "/v1/credential-validations/{scenario_id}/rules/{rule_id}",
+      "summary": "Delete rule",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }, { "name": "rule_id", "type": "uuid" }],
+      "responses": {
+        "204": { "description": "Rule deleted" },
+        "404": { "description": "Rule or scenario not found" }
+      }
+    },
+    {
+      "id": 12,
+      "method": "POST",
+      "path": "/v1/credential-validations/{scenario_id}/executions",
+      "summary": "Create execution",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }],
+      "responses": {
+        "201": { "description": "Execution created", "schema": { "$ref": "#/schemas/ExecutionResponse" } },
+        "404": { "description": "Scenario not found" }
+      }
+    },
+    {
+      "id": 13,
+      "method": "GET",
+      "path": "/v1/credential-validations/{scenario_id}/executions",
+      "summary": "List executions",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }],
+      "responses": {
+        "200": { "description": "List of executions", "schema": { "type": "array", "items": { "$ref": "#/schemas/ExecutionResponse" } } },
+        "404": { "description": "Scenario not found" }
+      }
+    },
+    {
+      "id": 14,
+      "method": "GET",
+      "path": "/v1/credential-validations/{scenario_id}/executions/{execution_id}",
+      "summary": "Get execution",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }, { "name": "execution_id", "type": "uuid" }],
+      "responses": {
+        "200": { "description": "Execution", "schema": { "$ref": "#/schemas/ExecutionResponse" } },
+        "404": { "description": "Execution or scenario not found" }
+      }
+    },
+    {
+      "id": 15,
+      "method": "PATCH",
+      "path": "/v1/credential-validations/{scenario_id}/executions/{execution_id}",
+      "summary": "Update execution status",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }, { "name": "execution_id", "type": "uuid" }],
+      "request_body": { "$ref": "#/schemas/ExecutionStatusUpdate" },
+      "responses": {
+        "200": { "description": "Updated execution", "schema": { "$ref": "#/schemas/ExecutionResponse" } },
+        "404": { "description": "Execution or scenario not found" },
+        "422": { "description": "Validation error" }
+      }
+    },
+    {
+      "id": 16,
+      "method": "GET",
+      "path": "/v1/credential-validations/{scenario_id}/executions/{execution_id}/summary",
+      "summary": "Get execution summary",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }, { "name": "execution_id", "type": "uuid" }],
+      "responses": {
+        "200": { "description": "Execution summary", "schema": { "$ref": "#/schemas/ExecutionSummary" } },
+        "404": { "description": "Execution or scenario not found" }
+      }
+    },
+    {
+      "id": 17,
+      "method": "GET",
+      "path": "/v1/credential-validations/{scenario_id}/executions/{execution_id}/results",
+      "summary": "List results",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }, { "name": "execution_id", "type": "uuid" }],
+      "responses": {
+        "200": { "description": "List of results", "schema": { "type": "array", "items": { "$ref": "#/schemas/ResultResponse" } } },
+        "404": { "description": "Execution or scenario not found" }
+      }
+    },
+    {
+      "id": 18,
+      "method": "POST",
+      "path": "/v1/credential-validations/{scenario_id}/executions/{execution_id}/results",
+      "summary": "Record result",
+      "tags": ["credential-validations"],
+      "path_params": [{ "name": "scenario_id", "type": "uuid" }, { "name": "execution_id", "type": "uuid" }],
+      "request_body": { "$ref": "#/schemas/ResultCreate" },
+      "responses": {
+        "201": { "description": "Result recorded", "schema": { "$ref": "#/schemas/ResultResponse" } },
+        "404": { "description": "Execution, scenario, or rule not found" },
+        "422": { "description": "Validation error" }
+      }
+    }
+  ],
+  "route_count": 18,
+  "schemas": {
+    "ScenarioCreate": {
+      "type": "object",
+      "required": ["page_url", "name", "coverage_area"],
+      "properties": {
+        "page_url": { "type": "string", "maxLength": 2048 },
+        "name": { "type": "string", "maxLength": 255 },
+        "description": { "type": "string", "nullable": true },
+        "coverage_area": { "type": "string", "enum": ["RENDERING","CONTENT_INTERACTIONS","NAVIGATION","CREDENTIAL_SUBMISSION","ERROR_RECOVERY"] },
+        "requirement_ref": { "type": "string", "maxLength": 50, "nullable": true },
+        "is_active": { "type": "boolean", "default": true }
+      }
+    },
+    "ScenarioUpdate": {
+      "type": "object",
+      "properties": {
+        "page_url": { "type": "string", "maxLength": 2048, "nullable": true },
+        "name": { "type": "string", "maxLength": 255, "nullable": true },
+        "description": { "type": "string", "nullable": true },
+        "coverage_area": { "type": "string", "enum": ["RENDERING","CONTENT_INTERACTIONS","NAVIGATION","CREDENTIAL_SUBMISSION","ERROR_RECOVERY"], "nullable": true },
+        "requirement_ref": { "type": "string", "maxLength": 50, "nullable": true },
+        "is_active": { "type": "boolean", "nullable": true }
+      }
+    },
+    "ScenarioResponse": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "page_url": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string", "nullable": true },
+        "coverage_area": { "type": "string", "enum": ["RENDERING","CONTENT_INTERACTIONS","NAVIGATION","CREDENTIAL_SUBMISSION","ERROR_RECOVERY"] },
+        "requirement_ref": { "type": "string", "nullable": true },
+        "is_active": { "type": "boolean" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "RuleCreate": {
+      "type": "object",
+      "required": ["rule_type"],
+      "properties": {
+        "rule_type": { "type": "string", "enum": ["PAGE_TITLE","ELEMENT_VISIBLE","ELEMENT_CLICKABLE","INPUT_ACCEPTS","NAVIGATION_TARGET","VALIDATION_MESSAGE","ERROR_MESSAGE","EMPTY_STATE","AUTH_GATE"] },
+        "selector": { "type": "string", "maxLength": 512, "nullable": true },
+        "expected_value": { "type": "string", "nullable": true },
+        "description": { "type": "string", "nullable": true }
+      }
+    },
+    "RuleUpdate": {
+      "type": "object",
+      "properties": {
+        "rule_type": { "type": "string", "enum": ["PAGE_TITLE","ELEMENT_VISIBLE","ELEMENT_CLICKABLE","INPUT_ACCEPTS","NAVIGATION_TARGET","VALIDATION_MESSAGE","ERROR_MESSAGE","EMPTY_STATE","AUTH_GATE"], "nullable": true },
+        "selector": { "type": "string", "maxLength": 512, "nullable": true },
+        "expected_value": { "type": "string", "nullable": true },
+        "description": { "type": "string", "nullable": true }
+      }
+    },
+    "RuleResponse": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "scenario_id": { "type": "string", "format": "uuid" },
+        "rule_type": { "type": "string", "enum": ["PAGE_TITLE","ELEMENT_VISIBLE","ELEMENT_CLICKABLE","INPUT_ACCEPTS","NAVIGATION_TARGET","VALIDATION_MESSAGE","ERROR_MESSAGE","EMPTY_STATE","AUTH_GATE"] },
+        "selector": { "type": "string", "nullable": true },
+        "expected_value": { "type": "string", "nullable": true },
+        "description": { "type": "string", "nullable": true },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "ExecutionStatusUpdate": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "type": "string", "enum": ["PENDING","RUNNING","PASSED","FAILED","ERROR"] },
+        "started_at": { "type": "string", "format": "date-time", "nullable": true },
+        "completed_at": { "type": "string", "format": "date-time", "nullable": true },
+        "error_message": { "type": "string", "nullable": true },
+        "total_rules": { "type": "integer", "minimum": 0, "nullable": true },
+        "passed_rules": { "type": "integer", "minimum": 0, "nullable": true },
+        "failed_rules": { "type": "integer", "minimum": 0, "nullable": true }
+      }
+    },
+    "ExecutionResponse": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "scenario_id": { "type": "string", "format": "uuid" },
+        "status": { "type": "string", "enum": ["PENDING","RUNNING","PASSED","FAILED","ERROR"] },
+        "started_at": { "type": "string", "format": "date-time", "nullable": true },
+        "completed_at": { "type": "string", "format": "date-time", "nullable": true },
+        "total_rules": { "type": "integer" },
+        "passed_rules": { "type": "integer" },
+        "failed_rules": { "type": "integer" },
+        "error_message": { "type": "string", "nullable": true },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "ExecutionSummary": {
+      "type": "object",
+      "properties": {
+        "execution_id": { "type": "string", "format": "uuid" },
+        "scenario_id": { "type": "string", "format": "uuid" },
+        "status": { "type": "string", "enum": ["PENDING","RUNNING","PASSED","FAILED","ERROR"] },
+        "total_rules": { "type": "integer" },
+        "passed_rules": { "type": "integer" },
+        "failed_rules": { "type": "integer" },
+        "pass_rate": { "type": "number", "format": "float" },
+        "started_at": { "type": "string", "format": "date-time", "nullable": true },
+        "completed_at": { "type": "string", "format": "date-time", "nullable": true }
+      }
+    },
+    "ResultCreate": {
+      "type": "object",
+      "required": ["rule_id", "passed"],
+      "properties": {
+        "rule_id": { "type": "string", "format": "uuid" },
+        "passed": { "type": "boolean" },
+        "actual_value": { "type": "string", "nullable": true },
+        "error_message": { "type": "string", "nullable": true }
+      }
+    },
+    "ResultResponse": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "execution_id": { "type": "string", "format": "uuid" },
+        "rule_id": { "type": "string", "format": "uuid" },
+        "passed": { "type": "boolean" },
+        "actual_value": { "type": "string", "nullable": true },
+        "error_message": { "type": "string", "nullable": true },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}
