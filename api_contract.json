@@ -1,0 +1,788 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ui_testing_software",
+    "description": "Backend service for UI testing — credential validation and session access control.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8001"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["health"],
+        "summary": "Health check",
+        "operationId": "health_check",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "healthy" },
+                    "service": { "type": "string", "example": "ui_testing_software" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/credential-validation/definitions": {
+      "post": {
+        "tags": ["credential-validation"],
+        "summary": "Create a credential-validation definition",
+        "operationId": "create_credential_validation_definition",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CredentialValidationDefinitionCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Definition created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CredentialValidationDefinitionResponse" }
+              }
+            }
+          },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "get": {
+        "tags": ["credential-validation"],
+        "summary": "List credential-validation definitions",
+        "operationId": "list_credential_validation_definitions",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/PageSize" },
+          { "$ref": "#/components/parameters/SortBy" },
+          { "$ref": "#/components/parameters/SortDir" },
+          { "name": "is_active", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "name", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of definitions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedCredentialValidationDefinitionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/credential-validation/definitions/{definition_id}": {
+      "get": {
+        "tags": ["credential-validation"],
+        "summary": "Get a single credential-validation definition",
+        "operationId": "get_credential_validation_definition",
+        "parameters": [{ "$ref": "#/components/parameters/DefinitionId" }],
+        "responses": {
+          "200": {
+            "description": "Definition",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CredentialValidationDefinitionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["credential-validation"],
+        "summary": "Update a credential-validation definition",
+        "operationId": "update_credential_validation_definition",
+        "parameters": [{ "$ref": "#/components/parameters/DefinitionId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CredentialValidationDefinitionUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated definition",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CredentialValidationDefinitionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["credential-validation"],
+        "summary": "Delete a credential-validation definition",
+        "operationId": "delete_credential_validation_definition",
+        "parameters": [{ "$ref": "#/components/parameters/DefinitionId" }],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/v1/credential-validation/executions": {
+      "post": {
+        "tags": ["credential-validation"],
+        "summary": "Create a credential-validation execution record",
+        "operationId": "create_credential_validation_execution",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CredentialValidationExecutionCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Execution created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CredentialValidationExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "get": {
+        "tags": ["credential-validation"],
+        "summary": "List credential-validation executions",
+        "operationId": "list_credential_validation_executions",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/PageSize" },
+          { "$ref": "#/components/parameters/SortBy" },
+          { "$ref": "#/components/parameters/SortDir" },
+          { "name": "definition_id", "in": "query", "schema": { "type": "string", "format": "uuid" } },
+          { "name": "status", "in": "query", "schema": { "$ref": "#/components/schemas/ExecutionStatusEnum" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of executions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedCredentialValidationExecutionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/credential-validation/executions/{execution_id}": {
+      "get": {
+        "tags": ["credential-validation"],
+        "summary": "Get a single credential-validation execution",
+        "operationId": "get_credential_validation_execution",
+        "parameters": [{ "$ref": "#/components/parameters/ExecutionId" }],
+        "responses": {
+          "200": {
+            "description": "Execution",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CredentialValidationExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["credential-validation"],
+        "summary": "Update a credential-validation execution",
+        "operationId": "update_credential_validation_execution",
+        "parameters": [{ "$ref": "#/components/parameters/ExecutionId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CredentialValidationExecutionUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated execution",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CredentialValidationExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/v1/session-access-control/definitions": {
+      "post": {
+        "tags": ["session-access-control"],
+        "summary": "Create a session-access-control definition",
+        "operationId": "create_session_access_control_definition",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SessionAccessControlDefinitionCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Definition created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SessionAccessControlDefinitionResponse" }
+              }
+            }
+          },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "get": {
+        "tags": ["session-access-control"],
+        "summary": "List session-access-control definitions",
+        "operationId": "list_session_access_control_definitions",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/PageSize" },
+          { "$ref": "#/components/parameters/SortBy" },
+          { "$ref": "#/components/parameters/SortDir" },
+          { "name": "is_active", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "name", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of definitions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSessionAccessControlDefinitionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/session-access-control/definitions/{definition_id}": {
+      "get": {
+        "tags": ["session-access-control"],
+        "summary": "Get a single session-access-control definition",
+        "operationId": "get_session_access_control_definition",
+        "parameters": [{ "$ref": "#/components/parameters/DefinitionId" }],
+        "responses": {
+          "200": {
+            "description": "Definition",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SessionAccessControlDefinitionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["session-access-control"],
+        "summary": "Update a session-access-control definition",
+        "operationId": "update_session_access_control_definition",
+        "parameters": [{ "$ref": "#/components/parameters/DefinitionId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SessionAccessControlDefinitionUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated definition",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SessionAccessControlDefinitionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["session-access-control"],
+        "summary": "Delete a session-access-control definition",
+        "operationId": "delete_session_access_control_definition",
+        "parameters": [{ "$ref": "#/components/parameters/DefinitionId" }],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/v1/session-access-control/executions": {
+      "post": {
+        "tags": ["session-access-control"],
+        "summary": "Create a session-access-control execution record",
+        "operationId": "create_session_access_control_execution",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SessionAccessControlExecutionCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Execution created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SessionAccessControlExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "get": {
+        "tags": ["session-access-control"],
+        "summary": "List session-access-control executions",
+        "operationId": "list_session_access_control_executions",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/PageSize" },
+          { "$ref": "#/components/parameters/SortBy" },
+          { "$ref": "#/components/parameters/SortDir" },
+          { "name": "definition_id", "in": "query", "schema": { "type": "string", "format": "uuid" } },
+          { "name": "status", "in": "query", "schema": { "$ref": "#/components/schemas/ExecutionStatusEnum" } },
+          { "name": "session_state", "in": "query", "schema": { "$ref": "#/components/schemas/SessionStateEnum" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of executions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSessionAccessControlExecutionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/session-access-control/executions/{execution_id}": {
+      "get": {
+        "tags": ["session-access-control"],
+        "summary": "Get a single session-access-control execution",
+        "operationId": "get_session_access_control_execution",
+        "parameters": [{ "$ref": "#/components/parameters/ExecutionId" }],
+        "responses": {
+          "200": {
+            "description": "Execution",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SessionAccessControlExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["session-access-control"],
+        "summary": "Update a session-access-control execution",
+        "operationId": "update_session_access_control_execution",
+        "parameters": [{ "$ref": "#/components/parameters/ExecutionId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SessionAccessControlExecutionUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated execution",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SessionAccessControlExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "Page": {
+        "name": "page",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "default": 1 }
+      },
+      "PageSize": {
+        "name": "page_size",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+      },
+      "SortBy": {
+        "name": "sort_by",
+        "in": "query",
+        "schema": { "type": "string", "default": "created_at" }
+      },
+      "SortDir": {
+        "name": "sort_dir",
+        "in": "query",
+        "schema": { "type": "string", "enum": ["asc", "desc"], "default": "desc" }
+      },
+      "DefinitionId": {
+        "name": "definition_id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "ExecutionId": {
+        "name": "execution_id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ExecutionStatusEnum": {
+        "type": "string",
+        "enum": ["pending", "running", "passed", "failed", "error", "skipped"]
+      },
+      "SessionStateEnum": {
+        "type": "string",
+        "enum": ["authenticated", "guest", "expired", "blocked"]
+      },
+      "ApplicabilityEnum": {
+        "type": "string",
+        "enum": ["applicable", "required", "optional", "blocked", "not_observed"]
+      },
+      "RequirementSpec": {
+        "type": "object",
+        "properties": {
+          "fr_id": { "type": "string" },
+          "description": { "type": "string" },
+          "lifecycle_section": { "type": "string" },
+          "acceptance_signal": { "type": "string" },
+          "applicability": { "$ref": "#/components/schemas/ApplicabilityEnum" },
+          "is_required": { "type": "boolean", "default": true }
+        },
+        "required": ["fr_id", "description", "lifecycle_section", "acceptance_signal"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "detail": { "type": "string" },
+          "code": { "type": "string", "nullable": true }
+        },
+        "required": ["detail"]
+      },
+      "CredentialValidationDefinitionCreate": {
+        "type": "object",
+        "required": ["name", "target_url"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+          "target_url": { "type": "string" },
+          "version": { "type": "string", "nullable": true },
+          "page_identity_indicator": { "type": "string", "nullable": true },
+          "viewport_width": { "type": "integer", "nullable": true },
+          "viewport_height": { "type": "integer", "nullable": true },
+          "visible_sections": { "nullable": true },
+          "actionable_controls": { "nullable": true },
+          "visible_inputs": { "nullable": true },
+          "credential_controls": { "nullable": true },
+          "valid_credential_scenarios": { "nullable": true },
+          "invalid_credential_combinations": { "nullable": true },
+          "validation_feedback_expectations": { "nullable": true },
+          "success_outcomes": { "nullable": true },
+          "error_feedback_expectations": { "nullable": true },
+          "empty_state_expectations": { "nullable": true },
+          "navigation_expectations": { "nullable": true },
+          "requirements": { "type": "array", "items": { "$ref": "#/components/schemas/RequirementSpec" }, "nullable": true },
+          "clean_session_required": { "type": "boolean", "default": true },
+          "delayed_rendering_behavior": { "nullable": true },
+          "retry_behavior": { "nullable": true },
+          "recovery_conditions": { "nullable": true },
+          "is_active": { "type": "boolean", "default": true }
+        }
+      },
+      "CredentialValidationDefinitionUpdate": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 255, "nullable": true },
+          "target_url": { "type": "string", "nullable": true },
+          "version": { "type": "string", "nullable": true },
+          "is_active": { "type": "boolean", "nullable": true }
+        }
+      },
+      "CredentialValidationDefinitionResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "target_url": { "type": "string" },
+          "version": { "type": "string", "nullable": true },
+          "page_identity_indicator": { "type": "string", "nullable": true },
+          "viewport_width": { "type": "integer", "nullable": true },
+          "viewport_height": { "type": "integer", "nullable": true },
+          "requirements": { "nullable": true },
+          "clean_session_required": { "type": "boolean" },
+          "is_active": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedCredentialValidationDefinitionResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CredentialValidationDefinitionResponse" }
+          },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" }
+        }
+      },
+      "CredentialValidationExecutionCreate": {
+        "type": "object",
+        "required": ["definition_id"],
+        "properties": {
+          "definition_id": { "type": "string", "format": "uuid" },
+          "target_url": { "type": "string", "nullable": true },
+          "target_version": { "type": "string", "nullable": true },
+          "status": { "$ref": "#/components/schemas/ExecutionStatusEnum" },
+          "summary_outcome": { "nullable": true },
+          "requirement_results": { "nullable": true },
+          "failure_details": { "nullable": true },
+          "recovery_details": { "nullable": true }
+        }
+      },
+      "CredentialValidationExecutionUpdate": {
+        "type": "object",
+        "properties": {
+          "status": { "$ref": "#/components/schemas/ExecutionStatusEnum" },
+          "started_at": { "type": "string", "format": "date-time", "nullable": true },
+          "completed_at": { "type": "string", "format": "date-time", "nullable": true },
+          "summary_outcome": { "nullable": true },
+          "requirement_results": { "nullable": true },
+          "failure_details": { "nullable": true },
+          "recovery_details": { "nullable": true }
+        }
+      },
+      "CredentialValidationExecutionResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "definition_id": { "type": "string", "format": "uuid" },
+          "target_url": { "type": "string", "nullable": true },
+          "target_version": { "type": "string", "nullable": true },
+          "status": { "$ref": "#/components/schemas/ExecutionStatusEnum" },
+          "started_at": { "type": "string", "format": "date-time", "nullable": true },
+          "completed_at": { "type": "string", "format": "date-time", "nullable": true },
+          "summary_outcome": { "nullable": true },
+          "requirement_results": { "nullable": true },
+          "failure_details": { "nullable": true },
+          "recovery_details": { "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedCredentialValidationExecutionResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CredentialValidationExecutionResponse" }
+          },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" }
+        }
+      },
+      "SessionAccessControlDefinitionCreate": {
+        "type": "object",
+        "required": ["name", "target_url"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+          "target_url": { "type": "string" },
+          "version": { "type": "string", "nullable": true },
+          "page_identity_indicator": { "type": "string", "nullable": true },
+          "viewport_width": { "type": "integer", "nullable": true },
+          "viewport_height": { "type": "integer", "nullable": true },
+          "session_states": { "nullable": true },
+          "protected_routes": { "nullable": true },
+          "guarded_actions": { "nullable": true },
+          "redirect_expectations": { "nullable": true },
+          "session_initialization": { "nullable": true },
+          "access_control_expectations": { "nullable": true },
+          "loading_state_expectations": { "nullable": true },
+          "empty_state_expectations": { "nullable": true },
+          "error_state_expectations": { "nullable": true },
+          "recovery_behavior": { "nullable": true },
+          "retry_behavior": { "nullable": true },
+          "requirements": { "type": "array", "items": { "$ref": "#/components/schemas/RequirementSpec" }, "nullable": true },
+          "clean_session_required": { "type": "boolean", "default": true },
+          "is_active": { "type": "boolean", "default": true }
+        }
+      },
+      "SessionAccessControlDefinitionUpdate": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 255, "nullable": true },
+          "target_url": { "type": "string", "nullable": true },
+          "version": { "type": "string", "nullable": true },
+          "is_active": { "type": "boolean", "nullable": true }
+        }
+      },
+      "SessionAccessControlDefinitionResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "target_url": { "type": "string" },
+          "version": { "type": "string", "nullable": true },
+          "page_identity_indicator": { "type": "string", "nullable": true },
+          "viewport_width": { "type": "integer", "nullable": true },
+          "viewport_height": { "type": "integer", "nullable": true },
+          "session_states": { "nullable": true },
+          "protected_routes": { "nullable": true },
+          "guarded_actions": { "nullable": true },
+          "redirect_expectations": { "nullable": true },
+          "session_initialization": { "nullable": true },
+          "access_control_expectations": { "nullable": true },
+          "loading_state_expectations": { "nullable": true },
+          "empty_state_expectations": { "nullable": true },
+          "error_state_expectations": { "nullable": true },
+          "recovery_behavior": { "nullable": true },
+          "retry_behavior": { "nullable": true },
+          "requirements": { "nullable": true },
+          "clean_session_required": { "type": "boolean" },
+          "is_active": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedSessionAccessControlDefinitionResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SessionAccessControlDefinitionResponse" }
+          },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" }
+        }
+      },
+      "SessionAccessControlExecutionCreate": {
+        "type": "object",
+        "required": ["definition_id"],
+        "properties": {
+          "definition_id": { "type": "string", "format": "uuid" },
+          "target_url": { "type": "string", "nullable": true },
+          "target_version": { "type": "string", "nullable": true },
+          "session_state": { "$ref": "#/components/schemas/SessionStateEnum" },
+          "status": { "$ref": "#/components/schemas/ExecutionStatusEnum" },
+          "access_outcome": { "nullable": true },
+          "requirement_results": { "nullable": true },
+          "failure_details": { "nullable": true },
+          "recovery_details": { "nullable": true }
+        }
+      },
+      "SessionAccessControlExecutionUpdate": {
+        "type": "object",
+        "properties": {
+          "session_state": { "$ref": "#/components/schemas/SessionStateEnum" },
+          "status": { "$ref": "#/components/schemas/ExecutionStatusEnum" },
+          "started_at": { "type": "string", "format": "date-time", "nullable": true },
+          "completed_at": { "type": "string", "format": "date-time", "nullable": true },
+          "access_outcome": { "nullable": true },
+          "requirement_results": { "nullable": true },
+          "failure_details": { "nullable": true },
+          "recovery_details": { "nullable": true }
+        }
+      },
+      "SessionAccessControlExecutionResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "definition_id": { "type": "string", "format": "uuid" },
+          "target_url": { "type": "string", "nullable": true },
+          "target_version": { "type": "string", "nullable": true },
+          "session_state": { "$ref": "#/components/schemas/SessionStateEnum" },
+          "status": { "$ref": "#/components/schemas/ExecutionStatusEnum" },
+          "started_at": { "type": "string", "format": "date-time", "nullable": true },
+          "completed_at": { "type": "string", "format": "date-time", "nullable": true },
+          "access_outcome": { "nullable": true },
+          "requirement_results": { "nullable": true },
+          "failure_details": { "nullable": true },
+          "recovery_details": { "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedSessionAccessControlExecutionResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SessionAccessControlExecutionResponse" }
+          },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
