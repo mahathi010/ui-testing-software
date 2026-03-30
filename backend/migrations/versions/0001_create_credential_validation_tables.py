@@ -1,0 +1,138 @@
+"""Create credential validation tables
+
+Revision ID: 0001
+Revises:
+Create Date: 2026-03-30 00:00:00.000000
+
+"""
+from typing import Sequence, Union
+
+import sqlalchemy as sa
+from alembic import op
+from sqlalchemy.dialects import postgresql
+
+# revision identifiers, used by Alembic.
+revision: str = "0001"
+down_revision: Union[str, None] = None
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+execution_status_enum = postgresql.ENUM(
+    "pending",
+    "running",
+    "passed",
+    "failed",
+    "error",
+    "skipped",
+    name="credential_validation_execution_status",
+    create_type=True,
+)
+
+
+def upgrade() -> None:
+    execution_status_enum.create(op.get_bind(), checkfirst=True)
+
+    op.create_table(
+        "credential_validation_definitions",
+        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("name", sa.String(255), nullable=False),
+        sa.Column("target_url", sa.Text, nullable=False),
+        sa.Column("version", sa.String(50), nullable=True),
+        sa.Column("page_identity_indicator", sa.Text, nullable=True),
+        sa.Column("viewport_width", sa.Integer, nullable=True),
+        sa.Column("viewport_height", sa.Integer, nullable=True),
+        sa.Column("visible_sections", postgresql.JSONB, nullable=True),
+        sa.Column("actionable_controls", postgresql.JSONB, nullable=True),
+        sa.Column("visible_inputs", postgresql.JSONB, nullable=True),
+        sa.Column("credential_controls", postgresql.JSONB, nullable=True),
+        sa.Column("valid_credential_scenarios", postgresql.JSONB, nullable=True),
+        sa.Column("invalid_credential_combinations", postgresql.JSONB, nullable=True),
+        sa.Column("validation_feedback_expectations", postgresql.JSONB, nullable=True),
+        sa.Column("success_outcomes", postgresql.JSONB, nullable=True),
+        sa.Column("error_feedback_expectations", postgresql.JSONB, nullable=True),
+        sa.Column("empty_state_expectations", postgresql.JSONB, nullable=True),
+        sa.Column("navigation_expectations", postgresql.JSONB, nullable=True),
+        sa.Column("requirements", postgresql.JSONB, nullable=True),
+        sa.Column("clean_session_required", sa.Boolean, nullable=False, server_default=sa.text("true")),
+        sa.Column("delayed_rendering_behavior", postgresql.JSONB, nullable=True),
+        sa.Column("retry_behavior", postgresql.JSONB, nullable=True),
+        sa.Column("recovery_conditions", postgresql.JSONB, nullable=True),
+        sa.Column("is_active", sa.Boolean, nullable=False, server_default=sa.text("true")),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
+    )
+
+    op.create_table(
+        "credential_validation_executions",
+        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column(
+            "definition_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey(
+                "credential_validation_definitions.id",
+                ondelete="CASCADE",
+            ),
+            nullable=False,
+        ),
+        sa.Column("target_url", sa.Text, nullable=True),
+        sa.Column("target_version", sa.String(50), nullable=True),
+        sa.Column(
+            "status",
+            execution_status_enum,
+            nullable=False,
+            server_default="pending",
+        ),
+        sa.Column("started_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("summary_outcome", postgresql.JSONB, nullable=True),
+        sa.Column("requirement_results", postgresql.JSONB, nullable=True),
+        sa.Column("failure_details", postgresql.JSONB, nullable=True),
+        sa.Column("recovery_details", postgresql.JSONB, nullable=True),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
+    )
+
+    op.create_index(
+        "ix_credential_validation_executions_definition_id",
+        "credential_validation_executions",
+        ["definition_id"],
+    )
+    op.create_index(
+        "ix_credential_validation_executions_status",
+        "credential_validation_executions",
+        ["status"],
+    )
+
+
+def downgrade() -> None:
+    op.drop_index(
+        "ix_credential_validation_executions_status",
+        table_name="credential_validation_executions",
+    )
+    op.drop_index(
+        "ix_credential_validation_executions_definition_id",
+        table_name="credential_validation_executions",
+    )
+    op.drop_table("credential_validation_executions")
+    op.drop_table("credential_validation_definitions")
+    execution_status_enum.drop(op.get_bind(), checkfirst=True)
