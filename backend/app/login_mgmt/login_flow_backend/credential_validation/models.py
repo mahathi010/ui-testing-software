@@ -3,9 +3,9 @@
 import enum
 import uuid
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import ENUM as PgEnum
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -41,25 +41,25 @@ class CredentialValidationDefinition(Base):
     viewport_width: Mapped[int | None] = mapped_column(Integer, nullable=True)
     viewport_height: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
-    visible_sections: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    actionable_controls: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    visible_inputs: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    credential_controls: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    visible_sections: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    actionable_controls: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    visible_inputs: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    credential_controls: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    valid_credential_scenarios: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    invalid_credential_combinations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    validation_feedback_expectations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    success_outcomes: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    error_feedback_expectations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    empty_state_expectations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    navigation_expectations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    valid_credential_scenarios: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    invalid_credential_combinations: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    validation_feedback_expectations: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    success_outcomes: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    error_feedback_expectations: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    empty_state_expectations: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    navigation_expectations: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    requirements: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    requirements: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     clean_session_required: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    delayed_rendering_behavior: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    retry_behavior: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    recovery_conditions: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    delayed_rendering_behavior: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    retry_behavior: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    recovery_conditions: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
@@ -101,10 +101,10 @@ class CredentialValidationExecution(Base):
     started_at: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    summary_outcome: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    requirement_results: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    failure_details: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    recovery_details: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    summary_outcome: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    requirement_results: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    failure_details: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    recovery_details: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

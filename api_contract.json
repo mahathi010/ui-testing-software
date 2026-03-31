@@ -1,0 +1,685 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ui_testing_software",
+    "description": "Backend service for UI testing — credential validation and session access control.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000"
+    }
+  ],
+  "paths": {
+    "/v1/credential-validation/definitions": {
+      "post": {
+        "tags": ["credential-validation"],
+        "summary": "Create a credential-validation definition",
+        "operationId": "create_definition",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DefinitionCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DefinitionResponse" }
+              }
+            }
+          },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "get": {
+        "tags": ["credential-validation"],
+        "summary": "List credential-validation definitions",
+        "operationId": "list_definitions",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "page_size", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "sort_by", "in": "query", "schema": { "type": "string", "default": "created_at" } },
+          { "name": "sort_dir", "in": "query", "schema": { "type": "string", "enum": ["asc", "desc"], "default": "desc" } },
+          { "name": "is_active", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "name", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedDefinitionResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/credential-validation/definitions/{definition_id}": {
+      "get": {
+        "tags": ["credential-validation"],
+        "summary": "Get a single credential-validation definition",
+        "operationId": "get_definition",
+        "parameters": [
+          { "name": "definition_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DefinitionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["credential-validation"],
+        "summary": "Update a credential-validation definition",
+        "operationId": "update_definition",
+        "parameters": [
+          { "name": "definition_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DefinitionUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DefinitionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["credential-validation"],
+        "summary": "Delete a credential-validation definition",
+        "operationId": "delete_definition",
+        "parameters": [
+          { "name": "definition_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "204": { "description": "No Content" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/v1/credential-validation/executions": {
+      "post": {
+        "tags": ["credential-validation"],
+        "summary": "Create a credential-validation execution record",
+        "operationId": "create_execution",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExecutionCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "get": {
+        "tags": ["credential-validation"],
+        "summary": "List credential-validation executions",
+        "operationId": "list_executions",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "page_size", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "sort_by", "in": "query", "schema": { "type": "string", "default": "created_at" } },
+          { "name": "sort_dir", "in": "query", "schema": { "type": "string", "enum": ["asc", "desc"], "default": "desc" } },
+          { "name": "definition_id", "in": "query", "schema": { "type": "string", "format": "uuid" } },
+          { "name": "status", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedExecutionResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/credential-validation/executions/{execution_id}": {
+      "get": {
+        "tags": ["credential-validation"],
+        "summary": "Get a single credential-validation execution",
+        "operationId": "get_execution",
+        "parameters": [
+          { "name": "execution_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["credential-validation"],
+        "summary": "Update a credential-validation execution",
+        "operationId": "update_execution",
+        "parameters": [
+          { "name": "execution_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExecutionUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExecutionResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/v1/session-access/check": {
+      "post": {
+        "tags": ["session-access"],
+        "summary": "Check session access for a resource",
+        "operationId": "check_session_access",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SessionCheckRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SessionCheckResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/session-access/guard": {
+      "post": {
+        "tags": ["session-access"],
+        "summary": "Attempt a guarded action",
+        "operationId": "attempt_guarded_action",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GuardedActionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GuardedActionResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/session-access/resources": {
+      "post": {
+        "tags": ["session-access"],
+        "summary": "Create a protected resource",
+        "operationId": "create_resource",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ResourceCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResourceResponse" }
+              }
+            }
+          },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "get": {
+        "tags": ["session-access"],
+        "summary": "List protected resources",
+        "operationId": "list_resources",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "page_size", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "sort_by", "in": "query", "schema": { "type": "string", "default": "created_at" } },
+          { "name": "sort_dir", "in": "query", "schema": { "type": "string", "enum": ["asc", "desc"], "default": "desc" } },
+          { "name": "is_active", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "protection_level", "in": "query", "schema": { "type": "string" } },
+          { "name": "resource_name", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedResourceResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/session-access/resources/{resource_id}": {
+      "get": {
+        "tags": ["session-access"],
+        "summary": "Get a protected resource",
+        "operationId": "get_resource",
+        "parameters": [
+          { "name": "resource_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResourceResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["session-access"],
+        "summary": "Update a protected resource",
+        "operationId": "update_resource",
+        "parameters": [
+          { "name": "resource_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ResourceUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResourceResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["session-access"],
+        "summary": "Delete a protected resource",
+        "operationId": "delete_resource",
+        "parameters": [
+          { "name": "resource_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "204": { "description": "No Content" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/v1/session-access/records": {
+      "get": {
+        "tags": ["session-access"],
+        "summary": "List session access records",
+        "operationId": "list_records",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "page_size", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "sort_by", "in": "query", "schema": { "type": "string", "default": "created_at" } },
+          { "name": "sort_dir", "in": "query", "schema": { "type": "string", "enum": ["asc", "desc"], "default": "desc" } },
+          { "name": "resource_id", "in": "query", "schema": { "type": "string", "format": "uuid" } },
+          { "name": "session_status", "in": "query", "schema": { "type": "string" } },
+          { "name": "outcome", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedAccessRecordResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["session-access"],
+        "summary": "Manually create an access record",
+        "operationId": "create_record",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccessRecordCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AccessRecordResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "NotFound": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "detail": { "type": "string" },
+          "code": { "type": "string", "nullable": true }
+        },
+        "required": ["detail"]
+      },
+      "DefinitionCreate": {
+        "type": "object",
+        "required": ["name", "target_url"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+          "target_url": { "type": "string" },
+          "version": { "type": "string", "nullable": true },
+          "page_identity_indicator": { "type": "string", "nullable": true },
+          "viewport_width": { "type": "integer", "nullable": true },
+          "viewport_height": { "type": "integer", "nullable": true },
+          "requirements": { "type": "array", "nullable": true },
+          "clean_session_required": { "type": "boolean", "default": true },
+          "is_active": { "type": "boolean", "default": true }
+        }
+      },
+      "DefinitionUpdate": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+          "target_url": { "type": "string" },
+          "version": { "type": "string" },
+          "is_active": { "type": "boolean" }
+        }
+      },
+      "DefinitionResponse": {
+        "type": "object",
+        "required": ["id", "name", "target_url", "clean_session_required", "is_active", "created_at", "updated_at"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "target_url": { "type": "string" },
+          "version": { "type": "string", "nullable": true },
+          "requirements": { "nullable": true },
+          "clean_session_required": { "type": "boolean" },
+          "is_active": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedDefinitionResponse": {
+        "type": "object",
+        "required": ["items", "total", "page", "page_size"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/DefinitionResponse" } },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" }
+        }
+      },
+      "ExecutionCreate": {
+        "type": "object",
+        "required": ["definition_id"],
+        "properties": {
+          "definition_id": { "type": "string", "format": "uuid" },
+          "target_url": { "type": "string", "nullable": true },
+          "target_version": { "type": "string", "nullable": true },
+          "status": { "type": "string", "enum": ["pending", "running", "passed", "failed", "error", "skipped"], "default": "pending" }
+        }
+      },
+      "ExecutionUpdate": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["pending", "running", "passed", "failed", "error", "skipped"] },
+          "started_at": { "type": "string", "format": "date-time", "nullable": true },
+          "completed_at": { "type": "string", "format": "date-time", "nullable": true }
+        }
+      },
+      "ExecutionResponse": {
+        "type": "object",
+        "required": ["id", "definition_id", "status", "created_at", "updated_at"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "definition_id": { "type": "string", "format": "uuid" },
+          "target_url": { "type": "string", "nullable": true },
+          "target_version": { "type": "string", "nullable": true },
+          "status": { "type": "string" },
+          "started_at": { "type": "string", "format": "date-time", "nullable": true },
+          "completed_at": { "type": "string", "format": "date-time", "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedExecutionResponse": {
+        "type": "object",
+        "required": ["items", "total", "page", "page_size"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/ExecutionResponse" } },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" }
+        }
+      },
+      "SessionCheckRequest": {
+        "type": "object",
+        "required": ["resource_path"],
+        "properties": {
+          "session_token": { "type": "string", "nullable": true },
+          "resource_path": { "type": "string" },
+          "action_type": { "type": "string", "enum": ["page_view", "guarded_action", "navigation", "media_access"], "default": "page_view" }
+        }
+      },
+      "SessionCheckResponse": {
+        "type": "object",
+        "required": ["is_valid", "session_status", "outcome"],
+        "properties": {
+          "is_valid": { "type": "boolean" },
+          "session_status": { "type": "string", "enum": ["active", "expired", "invalid", "anonymous"] },
+          "outcome": { "type": "string", "enum": ["allowed", "denied_guest", "denied_expired", "denied_invalid", "denied_forbidden", "redirected", "error"] },
+          "redirect_url": { "type": "string", "nullable": true },
+          "denial_reason": { "type": "string", "nullable": true },
+          "record_id": { "type": "string", "format": "uuid", "nullable": true }
+        }
+      },
+      "GuardedActionRequest": {
+        "type": "object",
+        "required": ["resource_path"],
+        "properties": {
+          "session_token": { "type": "string", "nullable": true },
+          "resource_path": { "type": "string" },
+          "action_description": { "type": "string", "nullable": true },
+          "request_metadata": { "nullable": true }
+        }
+      },
+      "GuardedActionResponse": {
+        "type": "object",
+        "required": ["allowed", "session_status", "outcome"],
+        "properties": {
+          "allowed": { "type": "boolean" },
+          "session_status": { "type": "string" },
+          "outcome": { "type": "string" },
+          "denial_reason": { "type": "string", "nullable": true },
+          "redirect_url": { "type": "string", "nullable": true },
+          "record_id": { "type": "string", "format": "uuid", "nullable": true }
+        }
+      },
+      "ResourceCreate": {
+        "type": "object",
+        "required": ["resource_path", "resource_name"],
+        "properties": {
+          "resource_path": { "type": "string" },
+          "resource_name": { "type": "string", "maxLength": 255 },
+          "protection_level": { "type": "string", "enum": ["public", "authenticated", "elevated"], "default": "authenticated" },
+          "description": { "type": "string", "nullable": true },
+          "session_requirements": { "nullable": true },
+          "is_active": { "type": "boolean", "default": true }
+        }
+      },
+      "ResourceUpdate": {
+        "type": "object",
+        "properties": {
+          "resource_path": { "type": "string" },
+          "resource_name": { "type": "string", "maxLength": 255 },
+          "protection_level": { "type": "string", "enum": ["public", "authenticated", "elevated"] },
+          "description": { "type": "string" },
+          "is_active": { "type": "boolean" }
+        }
+      },
+      "ResourceResponse": {
+        "type": "object",
+        "required": ["id", "resource_path", "resource_name", "protection_level", "is_active", "created_at", "updated_at"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "resource_path": { "type": "string" },
+          "resource_name": { "type": "string" },
+          "protection_level": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "session_requirements": { "nullable": true },
+          "is_active": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedResourceResponse": {
+        "type": "object",
+        "required": ["items", "total", "page", "page_size"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/ResourceResponse" } },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" }
+        }
+      },
+      "AccessRecordCreate": {
+        "type": "object",
+        "properties": {
+          "resource_id": { "type": "string", "format": "uuid", "nullable": true },
+          "session_token": { "type": "string", "nullable": true },
+          "session_status": { "type": "string", "enum": ["active", "expired", "invalid", "anonymous"], "default": "anonymous" },
+          "user_identifier": { "type": "string", "nullable": true },
+          "action_type": { "type": "string", "enum": ["page_view", "guarded_action", "navigation", "media_access"], "default": "page_view" },
+          "outcome": { "type": "string", "enum": ["allowed", "denied_guest", "denied_expired", "denied_invalid", "denied_forbidden", "redirected", "error"], "default": "allowed" },
+          "denial_reason": { "type": "string", "nullable": true },
+          "redirect_url": { "type": "string", "nullable": true },
+          "request_metadata": { "nullable": true }
+        }
+      },
+      "AccessRecordResponse": {
+        "type": "object",
+        "required": ["id", "session_status", "action_type", "outcome", "created_at", "updated_at"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "resource_id": { "type": "string", "format": "uuid", "nullable": true },
+          "session_token": { "type": "string", "nullable": true },
+          "session_status": { "type": "string" },
+          "user_identifier": { "type": "string", "nullable": true },
+          "action_type": { "type": "string" },
+          "outcome": { "type": "string" },
+          "denial_reason": { "type": "string", "nullable": true },
+          "redirect_url": { "type": "string", "nullable": true },
+          "request_metadata": { "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedAccessRecordResponse": {
+        "type": "object",
+        "required": ["items", "total", "page", "page_size"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/AccessRecordResponse" } },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

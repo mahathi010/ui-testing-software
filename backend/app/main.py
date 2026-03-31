@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.login_mgmt.login_flow_backend.credential_validation.api import router as credential_validation_router
+from app.login_mgmt.login_flow_backend.session_access_control.api import router as session_access_control_router
 
 
 @asynccontextmanager
@@ -32,6 +33,7 @@ app.add_middleware(
 )
 
 app.include_router(credential_validation_router)
+app.include_router(session_access_control_router)
 
 
 @app.get("/health", tags=["health"])
